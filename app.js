@@ -136,7 +136,8 @@ function renderDoors(portas) {
     btn.addEventListener('click', () => {
       rippleEffect(btn.querySelector('.door-circle'));
       if (navigator.vibrate) navigator.vibrate(40);
-      openModal(door);
+      currentDoor = door;
+      confirmOpen();
     });
     grid.appendChild(btn);
     setTimeout(() => {
