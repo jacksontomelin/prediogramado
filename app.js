@@ -53,6 +53,7 @@ function initSplash() {
     document.getElementById('appMain').style.display = 'block';
     renderTabs();
     setTab('F');
+    renderHistory();
     updateValidity();
     updateClock();
     setInterval(updateClock, 15000);
@@ -203,21 +204,8 @@ function closeSuccess() {
 }
 
 function addHistory(door, t) {
-  const list = document.getElementById('historyList');
-  const empty = list.querySelector('.history-empty');
-  if (empty) empty.remove();
-  const svg = window.ICONS[door.iconKey] || '';
-  const item = document.createElement('div');
-  item.className = 'history-item';
-  item.innerHTML = `
-    <div class="hi-icon" style="color:${door.color}">${svg}</div>
-    <div>
-      <div class="hi-name">${door.name}</div>
-      <div class="hi-time">Hoje às ${t}</div>
-    </div>
-    <div class="hi-check">${window.ICONS.check}</div>
-  `;
-  list.prepend(item);
+  saveHistory(door, t);
+  renderHistory();
 }
 
 function showToast(msg) {
@@ -249,3 +237,42 @@ function setNav(btn, tab) {
 });
 
 document.addEventListener('DOMContentLoaded', initSplash);
+
+// ===== PERSISTÊNCIA LOCAL =====
+const STORAGE_KEY = 'gramado_historico';
+
+function saveHistory(door, t) {
+  const existing = loadHistory();
+  existing.unshift({ name: door.name, label: door.label, iconKey: door.iconKey, color: door.color, time: t, date: new Date().toLocaleDateString('pt-BR') });
+  // Mantém só os últimos 20
+  const trimmed = existing.slice(0, 20);
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed)); } catch(e) {}
+}
+
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { return []; }
+}
+
+function renderHistory() {
+  const items = loadHistory();
+  const list = document.getElementById('historyList');
+  if (!items.length) {
+    list.innerHTML = '<div class="history-empty">Nenhum acesso registrado ainda.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  items.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'history-item';
+    const svg = window.ICONS[item.iconKey] || '';
+    el.innerHTML = `
+      <div class="hi-icon" style="color:${item.color}">${svg}</div>
+      <div>
+        <div class="hi-name">${item.name}</div>
+        <div class="hi-time">${item.date} às ${item.time}</div>
+      </div>
+      <div class="hi-check">${window.ICONS.check}</div>
+    `;
+    list.appendChild(el);
+  });
+}
