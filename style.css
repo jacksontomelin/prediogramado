@@ -199,3 +199,17 @@ body{font-family:'Inter',system-ui,sans-serif;background:linear-gradient(170deg,
 ::-webkit-scrollbar-thumb{background:var(--sage);border-radius:2px}
 ::-webkit-scrollbar-track{background:transparent}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* ===== MODAL QUESTION (estilo original) ===== */
+.modal-question{
+  font-size:15px;
+  color:var(--text);
+  text-align:center;
+  line-height:1.5;
+  margin-bottom:16px;
+  padding:0 8px;
+}
+.modal-question strong{
+  color:var(--pine);
+  font-weight:700;
+}
