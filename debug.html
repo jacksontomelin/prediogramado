@@ -3,129 +3,80 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Debug — Capturar Endpoint de Abertura</title>
+<title>Debug — Captura no iPhone</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif}
-body{background:#0e1a12;color:#e8f0ea;padding:16px;line-height:1.5}
-h1{font-size:18px;color:#c8a84b;margin-bottom:4px}
-.sub{font-size:12px;color:#7a8f80;margin-bottom:20px}
-.card{background:#16241a;border:1px solid #2d4a35;border-radius:12px;padding:16px;margin-bottom:14px}
-.card h2{font-size:14px;color:#c8a84b;margin-bottom:10px;display:flex;align-items:center;gap:8px}
-.step{font-size:13px;color:#c5d5c9;margin-bottom:8px;padding-left:8px;border-left:2px solid #4a7c5f}
-code{background:#0a140d;padding:2px 6px;border-radius:4px;color:#e6c96d;font-size:12px;font-family:ui-monospace,monospace;word-break:break-all}
-.snippet{background:#0a140d;border:1px solid #2d4a35;border-radius:8px;padding:12px;margin-top:10px;font-family:ui-monospace,monospace;font-size:11px;color:#a0c0a8;white-space:pre-wrap;word-break:break-all;position:relative}
-.copy-btn{background:#2d5a3d;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;margin-top:10px}
-.copy-btn:active{transform:scale(.96)}
-textarea{width:100%;min-height:200px;background:#0a140d;border:1px solid #2d4a35;border-radius:8px;padding:12px;color:#a0c0a8;font-family:ui-monospace,monospace;font-size:11px;margin-top:8px;resize:vertical}
+body{background:#0e1a12;color:#e8f0ea;padding:18px;line-height:1.55}
+h1{font-size:19px;color:#c8a84b;margin-bottom:4px}
+.sub{font-size:12px;color:#7a8f80;margin-bottom:22px}
+.card{background:#16241a;border:1px solid #2d4a35;border-radius:14px;padding:18px;margin-bottom:16px}
+.card h2{font-size:15px;color:#c8a84b;margin-bottom:12px}
+.step{font-size:13.5px;color:#c5d5c9;margin-bottom:10px;padding-left:10px;border-left:2px solid #4a7c5f}
+code{background:#0a140d;padding:2px 6px;border-radius:4px;color:#e6c96d;font-size:12px;word-break:break-all}
+.bm{display:block;background:linear-gradient(135deg,#2d5a3d,#4a7c5f);color:#fff;text-align:center;text-decoration:none;font-weight:700;font-size:16px;border-radius:12px;padding:16px;margin:14px 0;box-shadow:0 6px 20px rgba(45,90,61,.4)}
+.big{font-size:15px;color:#e6c96d;font-weight:600;margin:12px 0 6px}
+textarea{width:100%;min-height:220px;background:#0a140d;border:1px solid #2d4a35;border-radius:8px;padding:12px;color:#a0c0a8;font-family:ui-monospace,monospace;font-size:11px;margin-top:8px;resize:vertical}
+.copy-btn{background:#2d5a3d;color:#fff;border:none;border-radius:8px;padding:12px 18px;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px;width:100%}
+.copy-btn:active{transform:scale(.97)}
 .out{background:#0a140d;border:1px solid #2d4a35;border-radius:8px;padding:12px;margin-top:12px;font-family:ui-monospace,monospace;font-size:12px;color:#4cde8a;white-space:pre-wrap;word-break:break-all;min-height:40px}
-.badge{display:inline-block;background:#c8a84b;color:#0e1a12;font-size:10px;font-weight:700;border-radius:20px;padding:2px 8px}
-.warn{background:#3a2a16;border:1px solid #6b5020;border-radius:8px;padding:10px;font-size:12px;color:#e6c96d;margin-top:10px}
+.snippet{background:#0a140d;border:1px solid #2d4a35;border-radius:8px;padding:12px;margin-top:10px;font-family:ui-monospace,monospace;font-size:10.5px;color:#a0c0a8;white-space:pre-wrap;word-break:break-all}
+.num{display:inline-flex;width:22px;height:22px;background:#c8a84b;color:#0e1a12;border-radius:50%;align-items:center;justify-content:center;font-weight:700;font-size:12px;margin-right:6px}
 </style>
 </head>
 <body>
 
-<h1>🔍 Debug — Endpoint de Abertura</h1>
-<div class="sub">Descubra qual URL o sistema chama ao abrir uma porta</div>
+<h1>🔍 Captura de Endpoint — iPhone</h1>
+<div class="sub">Sem DevTools · funciona no Safari do iPhone</div>
 
 <div class="card">
-  <h2><span class="badge">MÉTODO 1</span> Console (mais rápido)</h2>
-  <div class="step">1. Abra a página do voucher original no navegador</div>
-  <div class="step">2. Abra o <strong>Console</strong> (menu ⋮ → Mais ferramentas → Ferramentas do desenvolvedor → Console). No iPhone use Safari no Mac conectado, ou o app <strong>Inspect</strong>.</div>
-  <div class="step">3. Cole o código abaixo no Console e aperte Enter:</div>
-  <div class="snippet" id="snippet1">// Intercepta TODA requisição de rede
-(function(){
-  const _fetch = window.fetch;
-  window.fetch = function(...a){
-    console.log('%c[FETCH]','color:#4cde8a', a[0], a[1]||'');
-    return _fetch.apply(this,a);
-  };
-  const _open = XMLHttpRequest.prototype.open;
-  XMLHttpRequest.prototype.open = function(m,u){
-    console.log('%c[XHR]','color:#e6c96d', m, u);
-    this.addEventListener('load',function(){
-      console.log('%c[XHR RESP]','color:#4cde8a', u, this.status, this.responseText.slice(0,200));
-    });
-    return _open.apply(this,arguments);
-  };
-  console.log('%c✅ Interceptor ativo! Agora clique ABRIR numa porta.','color:#c8a84b;font-size:14px');
-})();</div>
-  <button class="copy-btn" onclick="copyText('snippet1')">📋 Copiar código</button>
-  <div class="step" style="margin-top:12px">4. Clique numa porta → <strong>Abrir</strong>. Vai aparecer <code>[FETCH]</code> ou <code>[XHR]</code> com a URL.</div>
-  <div class="step">5. Copie tudo que apareceu e cole aqui no chat.</div>
+  <h2>📌 Jeito mais fácil — Bookmarklet</h2>
+  <div class="step"><span class="num">1</span>Toque no botão de compartilhar do Safari e <strong>Adicione esta página aos Favoritos</strong>.</div>
+  <div class="step"><span class="num">2</span>Copie o código abaixo:</div>
+  <button class="copy-btn" onclick="copyBM()">📋 Copiar código do interceptor</button>
+  <div class="snippet" id="bmcode">javascript:(function(){var L=[];var _f=window.fetch;window.fetch=function(){L.push('FETCH '+arguments[0]+' '+(arguments[1]?JSON.stringify(arguments[1]):''));show();return _f.apply(this,arguments);};var _o=XMLHttpRequest.prototype.open;var _s=XMLHttpRequest.prototype.send;XMLHttpRequest.prototype.open=function(m,u){this._m=m;this._u=u;return _o.apply(this,arguments);};XMLHttpRequest.prototype.send=function(b){var x=this;L.push('XHR '+x._m+' '+x._u+(b?' BODY='+b:''));x.addEventListener('load',function(){L.push('RESP '+x.status+' '+(x.responseText||'').slice(0,150));show();});show();return _s.apply(this,arguments);};function show(){var d=document.getElementById('__dbg');if(!d){d=document.createElement('div');d.id='__dbg';d.style.cssText='position:fixed;bottom:0;left:0;right:0;max-height:45%;overflow:auto;background:#0a140d;color:#4cde8a;font:11px monospace;padding:10px;z-index:999999;border-top:2px solid #c8a84b;white-space:pre-wrap;word-break:break-all';document.body.appendChild(d);}d.textContent='=== ENDPOINTS CAPTURADOS ===\n'+L.join('\n')+'\n\n(toque e segure para copiar)';}show();alert('Interceptor ativo! Agora toque ABRIR numa porta. O endpoint vai aparecer embaixo da tela.');})();</div>
+  <div class="step" style="margin-top:14px"><span class="num">3</span>Vá em <strong>Favoritos</strong>, toque em <strong>Editar</strong>, abra o favorito que você criou e <strong>cole o código no lugar do endereço</strong>. Dê um nome tipo "Debug". Salve.</div>
+  <div class="step"><span class="num">4</span>Abra a <strong>página do voucher original</strong>.</div>
+  <div class="step"><span class="num">5</span>Toque na barra de endereço, digite <strong>Debug</strong> e toque no favorito. Vai aparecer um alerta "Interceptor ativo".</div>
+  <div class="step"><span class="num">6</span>Toque numa porta → <strong>Abrir</strong>. O endpoint aparece numa faixa preta embaixo da tela.</div>
+  <div class="step"><span class="num">7</span>Toque e segure nessa faixa, copie tudo, e <strong>cole aqui no chat</strong>.</div>
 </div>
 
 <div class="card">
-  <h2><span class="badge">MÉTODO 2</span> Ver o código-fonte JS</h2>
-  <div class="step">1. Na página original, veja o HTML: menu → <strong>Exibir código-fonte</strong> (ou <code>view-source:</code> antes da URL)</div>
-  <div class="step">2. Procure por <code>Abrir</code>, <code>AbrirPorta</code>, <code>fetch</code> ou <code>ajax</code></div>
-  <div class="step">3. Cole o trecho aqui no chat</div>
-</div>
-
-<div class="card">
-  <h2>🧪 Analisador local</h2>
-  <div class="step">Se você copiou o HTML/JS da página, cole abaixo que eu extraio os endpoints automaticamente:</div>
-  <textarea id="input" placeholder="Cole aqui o código HTML ou JS da página original..."></textarea>
+  <h2>🧪 Ou: cole o código-fonte aqui</h2>
+  <div class="step">Na página original, troque <code>https://</code> por <code>view-source:https://</code> na barra de endereço, copie tudo, e cole abaixo:</div>
+  <textarea id="input" placeholder="Cole aqui o HTML/JS da página original..."></textarea>
   <button class="copy-btn" onclick="analyze()">🔎 Analisar endpoints</button>
   <div class="out" id="output">Aguardando código...</div>
 </div>
 
 <script>
-function copyText(id){
-  const t = document.getElementById(id).textContent;
+function copyBM(){
+  const t = document.getElementById('bmcode').textContent;
   navigator.clipboard.writeText(t).then(()=>{
-    event.target.textContent = '✅ Copiado!';
-    setTimeout(()=>event.target.textContent='📋 Copiar código', 1500);
+    event.target.textContent='✅ Copiado! Agora crie o favorito';
+    setTimeout(()=>event.target.textContent='📋 Copiar código do interceptor',2000);
   });
 }
-
 function analyze(){
-  const code = document.getElementById('input').value;
-  const out = document.getElementById('output');
-  if(!code.trim()){ out.textContent='Cole algum código primeiro.'; return; }
-
-  const found = new Set();
-
-  // URLs em fetch/ajax/xhr
-  const patterns = [
+  const code=document.getElementById('input').value;
+  const out=document.getElementById('output');
+  if(!code.trim()){out.textContent='Cole algum código primeiro.';return;}
+  const found=new Set();
+  const patterns=[
     /fetch\s*\(\s*['"`]([^'"`]+)['"`]/gi,
     /url\s*:\s*['"`]([^'"`]+)['"`]/gi,
     /\.open\s*\(\s*['"`]\w+['"`]\s*,\s*['"`]([^'"`]+)['"`]/gi,
     /\$\.(get|post|ajax)\s*\(\s*['"`]([^'"`]+)['"`]/gi,
-    /action\s*=\s*['"`]([^'"`]+)['"`]/gi,
     /(\/CartaoVisitante\/\w+)/gi,
     /(\/[A-Za-z]+\/(Abrir|Open|Porta|Door)\w*)/gi,
-    /(https?:\/\/[^\s'"`<>]+)/gi,
   ];
-
-  patterns.forEach(re=>{
-    let m;
-    while((m = re.exec(code))!==null){
-      const url = m[m.length-1] || m[1];
-      if(url && url.length > 2 && !url.startsWith('data:') && !/\.(css|png|jpg|svg|woff|ico)/i.test(url)){
-        found.add(url);
-      }
-    }
-  });
-
-  // Nomes de função relacionados a abrir
-  const funcs = [];
-  const fre = /function\s+(\w*(?:abrir|open|porta|door)\w*)/gi;
-  let fm;
-  while((fm = fre.exec(code))!==null){ funcs.push(fm[1]); }
-
-  let result = '';
-  if(found.size){
-    result += '🎯 ENDPOINTS ENCONTRADOS:\n';
-    [...found].forEach(u=> result += '  • '+u+'\n');
-  } else {
-    result += '⚠️ Nenhuma URL clara encontrada.\n';
-  }
-  if(funcs.length){
-    result += '\n🔧 FUNÇÕES DE ABERTURA:\n';
-    funcs.forEach(f=> result += '  • '+f+'()\n');
-  }
-  result += '\n📋 Copie isso e cole no chat.';
-  out.textContent = result;
+  patterns.forEach(re=>{let m;while((m=re.exec(code))!==null){const u=m[m.length-1]||m[1];if(u&&u.length>2&&!/\.(css|png|jpg|svg|woff|ico)/i.test(u))found.add(u);}});
+  const funcs=[];const fre=/function\s+(\w*(?:abrir|open|porta|door)\w*)/gi;let fm;while((fm=fre.exec(code))!==null)funcs.push(fm[1]);
+  let r='';
+  if(found.size){r+='🎯 ENDPOINTS:\n';[...found].forEach(u=>r+='  • '+u+'\n');}else r+='⚠️ Nenhuma URL clara.\n';
+  if(funcs.length){r+='\n🔧 FUNÇÕES:\n';funcs.forEach(f=>r+='  • '+f+'()\n');}
+  r+='\n📋 Cole isso no chat.';
+  out.textContent=r;
 }
 </script>
 </body>
