@@ -1,116 +1,222 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Aire Gramado Zagonel – Acesso Visitante</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <meta name="theme-color" content="#0e2016"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <title>Aire Gramado — Bloco F</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-  <!-- Fundo floresta -->
-  <div class="forest-bg">
-    <div class="snowflake" style="left:10%;animation-delay:0s">❄</div>
-    <div class="snowflake" style="left:30%;animation-delay:1.5s">❄</div>
-    <div class="snowflake" style="left:55%;animation-delay:3s">❄</div>
-    <div class="snowflake" style="left:75%;animation-delay:0.8s">❄</div>
-    <div class="snowflake" style="left:90%;animation-delay:2.2s">❄</div>
-    <div class="pine" style="left:-20px;bottom:0">🌲</div>
-    <div class="pine" style="right:-10px;bottom:0">🌲</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <span class="time" id="clock">--:--</span>
+  <div class="status-icons">
+    <span>📶</span><span>🔋</span>
+  </div>
+</div>
+
+<!-- SPLASH SCREEN -->
+<div class="splash" id="splash">
+  <div class="splash-pine left">🌲</div>
+  <div class="splash-pine right">🌲</div>
+  <div class="splash-snow" id="splashSnow"></div>
+  <div class="splash-content">
+    <div class="splash-logo">⛰️</div>
+    <div class="splash-title">Aire Gramado</div>
+    <div class="splash-sub">Zagonel · Gramado/RS</div>
+    <div class="splash-loader">
+      <div class="loader-bar" id="loaderBar"></div>
+    </div>
+    <div class="splash-hint">Carregando acesso...</div>
+  </div>
+</div>
+
+<!-- APP MAIN -->
+<div class="app" id="appMain" style="display:none">
+
+  <!-- HEADER COM PERFIL -->
+  <div class="app-header">
+    <div class="header-left">
+      <div class="avatar-ring">
+        <div class="avatar">L</div>
+        <div class="avatar-online"></div>
+      </div>
+      <div class="header-info">
+        <div class="header-welcome">Bem-vindo,</div>
+        <div class="header-name">Lisandra</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="notif-btn" onclick="showNotif()">
+        🔔
+        <span class="notif-badge">1</span>
+      </button>
+    </div>
   </div>
 
-  <!-- Header -->
-  <header class="app-header">
-    <div class="hotel-badge">
-      <div class="badge-icon">⛰️</div>
+  <!-- CARD DO VOUCHER -->
+  <div class="voucher-card">
+    <div class="vc-glow"></div>
+    <div class="vc-top">
+      <div class="vc-label">Acesso Visitante</div>
+      <div class="vc-status" id="vcStatus">
+        <div class="vc-dot pulse"></div>
+        <span id="vcStatusText">Ativo</span>
+      </div>
+    </div>
+    <div class="vc-unit">Unidade <span class="vc-num">5303</span></div>
+    <div class="vc-block">Bloco <span class="vc-bl">E</span> — Gramado/RS</div>
+    <div class="vc-divider"></div>
+    <div class="vc-validity">
+      <div class="vc-vitem">
+        <div class="vc-vl">Início</div>
+        <div class="vc-vv">26 Ago · 15:00</div>
+      </div>
+      <div class="vc-vsep">→</div>
+      <div class="vc-vitem">
+        <div class="vc-vl">Término</div>
+        <div class="vc-vv">02 Set · 11:15</div>
+      </div>
+    </div>
+    <div class="vc-progress-wrap">
+      <div class="vc-progress" id="vcProgress"></div>
+    </div>
+    <div class="vc-remaining" id="vcRemaining">Calculando...</div>
+  </div>
+
+  <!-- SEÇÃO BLOCO F -->
+  <div class="section-header">
+    <div class="sh-icon">🏢</div>
+    <div>
+      <div class="sh-title">Bloco F</div>
+      <div class="sh-sub">3 acessos liberados</div>
+    </div>
+    <div class="sh-badge">SEU BLOCO</div>
+  </div>
+
+  <!-- GRID BOLINHAS — apenas Bloco F -->
+  <div class="doors-grid" id="doorsGrid"></div>
+
+  <!-- QUICK INFO -->
+  <div class="quick-info">
+    <div class="qi-item">
+      <div class="qi-icon">📍</div>
+      <div class="qi-text">
+        <div class="qi-title">Localização</div>
+        <div class="qi-val">Rua Sete de Setembro, 100</div>
+      </div>
+    </div>
+    <div class="qi-item">
+      <div class="qi-icon">⏰</div>
+      <div class="qi-text">
+        <div class="qi-title">Check-out</div>
+        <div class="qi-val" id="countdown">--</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORICO -->
+  <div class="section-label">Histórico de acessos</div>
+  <div class="history-list" id="historyList">
+    <div class="history-empty">Nenhum acesso registrado ainda.</div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="setNav(this,'home')">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Início</span>
+    </button>
+    <button class="nav-item" onclick="setNav(this,'map')">
+      <span class="nav-icon">🗺️</span>
+      <span class="nav-label">Mapa</span>
+    </button>
+    <button class="nav-item" onclick="setNav(this,'info')">
+      <span class="nav-icon">ℹ️</span>
+      <span class="nav-label">Informações</span>
+    </button>
+  </div>
+
+</div><!-- /app -->
+
+<!-- MODAL ABERTURA -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-icon" id="modalIcon">🚪</div>
+    <div class="modal-title" id="modalTitle">Abrir Porta</div>
+    <div class="modal-door" id="modalDoor">–</div>
+
+    <div class="modal-info">
+      <div class="mi-row">
+        <span class="mi-l">Bloco</span>
+        <span class="mi-v" id="miBloco">F</span>
+      </div>
+      <div class="mi-row">
+        <span class="mi-l">Tipo</span>
+        <span class="mi-v" id="miTipo">–</span>
+      </div>
+      <div class="mi-row">
+        <span class="mi-l">Status</span>
+        <span class="mi-v success">✅ Autorizado</span>
+      </div>
+    </div>
+
+    <div class="modal-hint">Confirme para liberar o acesso agora.</div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-open" id="btnOpen" onclick="confirmOpen()">
+        <span class="btn-icon">🔓</span> Abrir
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUCESSO -->
+<div class="modal-overlay" id="successOverlay">
+  <div class="modal success-modal">
+    <div class="success-ring">
+      <div class="success-check" id="successCheck">✓</div>
+    </div>
+    <div class="modal-title">Acesso Liberado!</div>
+    <div class="success-door" id="successDoor">–</div>
+    <div class="success-time" id="successTime">–</div>
+    <div class="open-timer">
+      <div class="ot-label">Porta abre por</div>
+      <div class="ot-count" id="openTimer">5</div>
+      <div class="ot-label">segundos</div>
+    </div>
+    <div class="prog-wrap"><div class="prog-bar" id="progressBar"></div></div>
+    <button class="btn-open full" onclick="closeSuccess()">Fechar</button>
+  </div>
+</div>
+
+<!-- NOTIFICAÇÃO TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- NOTIF MODAL -->
+<div class="modal-overlay" id="notifOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('notifOverlay').classList.remove('active')">✕</button>
+    <div class="modal-icon">🔔</div>
+    <div class="modal-title">Notificações</div>
+    <div class="notif-item">
+      <div class="ni-dot"></div>
       <div>
-        <div class="hotel-name">Aire Gramado Zagonel</div>
-        <div class="hotel-sub">Gramado · Rio Grande do Sul</div>
-      </div>
-    </div>
-    <div class="validity-chip" id="validityChip">
-      <span class="chip-dot pulse"></span>
-      <span id="validityText">Carregando...</span>
-    </div>
-  </header>
-
-  <!-- Card do visitante -->
-  <section class="guest-card">
-    <div class="guest-avatar">👤</div>
-    <div class="guest-info">
-      <div class="guest-label">Convidado por</div>
-      <div class="guest-name">Lisandra</div>
-      <div class="guest-unit">Unidade 5303 — Bloco E</div>
-    </div>
-  </section>
-
-  <!-- Validade banner -->
-  <div class="validity-banner">
-    <div class="vb-icon">📅</div>
-    <div class="vb-text">
-      <div class="vb-title">Período de acesso</div>
-      <div class="vb-dates">
-        <span class="date-tag start">▶ 26/08/2026 às 15:00</span>
-        <span class="date-sep">→</span>
-        <span class="date-tag end">⏹ 02/09/2026 às 11:15</span>
+        <div class="ni-text">Seu voucher está ativo e válido até 02/09/2026.</div>
+        <div class="ni-time">Agora</div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Título seção portas -->
-  <div class="section-title">
-    <div class="section-line"></div>
-    <span>🔑 Portas Liberadas</span>
-    <div class="section-line"></div>
-  </div>
-
-  <!-- Grid de portas em bolinha -->
-  <div class="doors-grid" id="doorsGrid">
-    <!-- gerado via JS -->
-  </div>
-
-  <!-- Barra inferior fixa -->
-  <div class="bottom-bar">
-    <div class="local-info">
-      <div class="local-icon">📍</div>
-      <div>
-        <div class="local-name">Rua Sete de Setembro (Portaria B), 100</div>
-        <div class="local-cep">CEP 95670-000 · Gramado/RS</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- POPUP de confirmação -->
-  <div class="popup-overlay" id="popupOverlay">
-    <div class="popup-card">
-      <div class="popup-icon" id="popupIcon">🚪</div>
-      <div class="popup-title">Abrir porta?</div>
-      <div class="popup-door" id="popupDoorName">–</div>
-      <div class="popup-hint">Esta ação abrirá o acesso via QR autorizado.</div>
-      <div class="popup-actions">
-        <button class="btn-cancel" onclick="closePopup()">✕ Cancelar</button>
-        <button class="btn-open" id="btnOpen" onclick="confirmOpen()">🔓 Abrir</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- POPUP de sucesso -->
-  <div class="popup-overlay" id="successOverlay">
-    <div class="popup-card success-card">
-      <div class="popup-icon bounce">✅</div>
-      <div class="popup-title">Porta Aberta!</div>
-      <div class="popup-door" id="successDoorName">–</div>
-      <div class="popup-hint success-hint">Acesso liberado com sucesso.</div>
-      <div class="progress-bar-wrap">
-        <div class="progress-bar" id="progressBar"></div>
-      </div>
-      <div class="popup-actions">
-        <button class="btn-open" onclick="closeSuccess()">OK</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

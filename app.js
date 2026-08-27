@@ -1,247 +1,325 @@
-// =============================================
-// AIRE GRAMADO ZAGONEL — Voucher App v2.0
-// Condomínio F — Jackson Tomelin
-// =============================================
+// ============================================================
+// AIRE GRAMADO ZAGONEL — Bloco F App v3.0
+// Jackson Tomelin · UniController
+// ============================================================
 
-const VOUCHER_URL = 'https://www.condominioautonomo.com.br/CartaoVisitante/Voucher?code=14869370-926c-455a-a47b-7b3863a11bf0&type=8';
-
-// --- Mapeamento de categorias + ícones ---
-const DOOR_CATEGORIES = {
-  escada:    { icon: '🪜', cat: 'cat-escada',    label: 'Escada'    },
-  elevador:  { icon: '🛗', cat: 'cat-elevador',  label: 'Elevador'  },
-  hall:      { icon: '🏛️', cat: 'cat-hall',      label: 'Hall'      },
-  piscina:   { icon: '🏊', cat: 'cat-lazer',     label: 'Piscina'   },
-  academia:  { icon: '🏋️', cat: 'cat-lazer',     label: 'Academia'  },
-  jogos:     { icon: '🎮', cat: 'cat-lazer',     label: 'Jogos'     },
-  brinquedo: { icon: '🧸', cat: 'cat-lazer',     label: 'Brinquedo' },
-  portaria:  { icon: '🚗', cat: 'cat-portaria',  label: 'Portaria'  },
-  visitante: { icon: '🙋', cat: 'cat-visitante', label: 'Visitante' },
-  morador:   { icon: '🏠', cat: 'cat-morador',   label: 'Morador'   },
-  garagem:   { icon: '🅿️', cat: 'cat-garagem',   label: 'Garagem'   },
-  veiculos:  { icon: '🚗', cat: 'cat-portaria',  label: 'Veículos'  },
-};
-
-// --- Dados raspados (scrapeados) do HTML do voucher ---
-const DOORS_RAW = [
-  'C - S1 - Escadaria',
-  'C - Hall do Térreo',
-  'C - S2 - Escadaria',
-  '2 - Academia',
-  'B - S1 - Escada',
-  'C - S1 - Elevador',
-  '3 - Piscina',
-  '5 - Sala de Jogos',
-  'B - S2 - Escada',
-  'B - Porta do Hall',
-  'C - S2 - Elevador',
-  '4 - Brinquedoteca',
-  'D - Elevador',
-  'E - Elevador',
-  'Visitante - Eclusa interna',
-  'E - Escada Garagem',
-  'F - Escada da garagem',
-  'Morador - Eclusa externa',
-  'Morador - Eclusa interna',
-  'G - Escadaria Garagem',
-  'G - Elevador',
-  'E - Hall do Térreo',
-  'D - Escada da Garagem',
-  '0 - Veículos - Portaria Rua Nelson Dinnebier',
-  '1 - Veículos - Portaria da Rua Sete de Setembro',
-  'D - Hall do Térreo',
-  'F - Hall do Térreo',
-  'Visitante - Eclusa externa',
-  'G - Hall do Térreo',
-  'F - Elevador',
+// --- Somente portas do Bloco F ---
+const BLOCO_F = [
+  {
+    id: 'f-escada',
+    name: 'Escada da Garagem',
+    label: 'Escada',
+    sub: 'Garagem',
+    icon: '🪜',
+    tipo: 'Escada',
+    cat: 'escada',
+  },
+  {
+    id: 'f-hall',
+    name: 'F - Hall do Térreo',
+    label: 'Hall',
+    sub: 'Térreo',
+    icon: '🏛️',
+    tipo: 'Hall',
+    cat: 'hall',
+  },
+  {
+    id: 'f-elevador',
+    name: 'F - Elevador',
+    label: 'Elevador',
+    sub: 'Bloco F',
+    icon: '🛗',
+    tipo: 'Elevador',
+    cat: 'elevador',
+  },
 ];
 
-// --- Classifica a porta ---
-function classifyDoor(name) {
-  const n = name.toLowerCase();
-  if (n.includes('piscina'))    return DOOR_CATEGORIES.piscina;
-  if (n.includes('academia'))   return DOOR_CATEGORIES.academia;
-  if (n.includes('jogo'))       return DOOR_CATEGORIES.jogos;
-  if (n.includes('brinquedo'))  return DOOR_CATEGORIES.brinquedo;
-  if (n.includes('visitante'))  return DOOR_CATEGORIES.visitante;
-  if (n.includes('morador'))    return DOOR_CATEGORIES.morador;
-  if (n.includes('veículo') || n.includes('veiculo')) return DOOR_CATEGORIES.veiculos;
-  if (n.includes('portaria'))   return DOOR_CATEGORIES.portaria;
-  if (n.includes('garagem'))    return DOOR_CATEGORIES.garagem;
-  if (n.includes('elevador'))   return DOOR_CATEGORIES.elevador;
-  if (n.includes('escada') || n.includes('escadaria')) return DOOR_CATEGORIES.escada;
-  if (n.includes('hall') || n.includes('térreo'))      return DOOR_CATEGORIES.hall;
-  return { icon: '🚪', cat: 'cat-acesso', label: 'Acesso' };
-}
+// --- Estado global ---
+let currentDoor = null;
+let openTimerInterval = null;
+let historyItems = [];
 
-// --- Formata o label curto (bloco + tipo) ---
-function formatLabel(name) {
-  // Ex: "C - S1 - Escadaria" → bloco "C", sub "S1 · Escadaria"
-  const parts = name.split(' - ').map(s => s.trim());
-  if (parts.length === 3) {
-    return { main: parts[2], sub: `Bloco ${parts[0]} · ${parts[1]}` };
-  }
-  if (parts.length === 2) {
-    return { main: parts[1], sub: `Bloco ${parts[0]}` };
-  }
-  // Numerado: "2 - Academia"
-  const numMatch = name.match(/^(\d+)\s*-\s*(.+)/);
-  if (numMatch) {
-    return { main: numMatch[2], sub: `#${numMatch[1]}` };
-  }
-  return { main: name, sub: '' };
-}
-
-// --- Gera o grid de bolinhas ---
-function renderDoors() {
-  const grid = document.getElementById('doorsGrid');
-  grid.innerHTML = '';
-
-  DOORS_RAW.forEach((rawName, idx) => {
-    const cat  = classifyDoor(rawName);
-    const lbl  = formatLabel(rawName);
-
-    const btn  = document.createElement('button');
-    btn.className = `door-btn ${cat.cat}`;
-    btn.setAttribute('aria-label', rawName);
-    btn.style.animationDelay = `${idx * 0.04}s`;
-
-    btn.innerHTML = `
-      <div class="door-icon">${cat.icon}</div>
-      <div class="door-label">${lbl.main}</div>
-      ${lbl.sub ? `<div class="door-sub">${lbl.sub}</div>` : ''}
+// ===== SPLASH =====
+function initSplash() {
+  // Gera flocos de neve
+  const snow = document.getElementById('splashSnow');
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'snow-p';
+    p.textContent = ['❄', '❅', '❆'][i % 3];
+    p.style.cssText = `
+      left:${Math.random()*100}%;
+      animation-duration:${5+Math.random()*7}s;
+      animation-delay:${-Math.random()*10}s;
+      font-size:${10+Math.random()*10}px;
     `;
+    snow.appendChild(p);
+  }
 
-    btn.addEventListener('click', (e) => {
-      // Efeito ripple
-      const ripple = document.createElement('div');
-      ripple.className = 'ripple-circle';
-      btn.appendChild(ripple);
-      setTimeout(() => ripple.remove(), 600);
+  // Barra de loading
+  const bar = document.getElementById('loaderBar');
+  let pct = 0;
+  const iv = setInterval(() => {
+    pct += Math.random() * 18;
+    if (pct >= 100) { pct = 100; clearInterval(iv); }
+    bar.style.width = pct + '%';
+  }, 120);
 
-      openPopup(rawName, cat.icon);
-    });
-
-    // Entrada com fade-in
-    btn.style.opacity = '0';
-    btn.style.transform = 'scale(0.6)';
-    grid.appendChild(btn);
-
-    setTimeout(() => {
-      btn.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1)';
-      btn.style.opacity = '1';
-      btn.style.transform = 'scale(1)';
-    }, 60 + idx * 40);
-  });
+  // Revela app
+  setTimeout(() => {
+    document.getElementById('splash').classList.add('hide');
+    document.getElementById('appMain').style.display = 'block';
+    renderDoors();
+    updateValidity();
+    updateClock();
+    setInterval(updateClock, 10000);
+    setInterval(updateValidity, 60000);
+  }, 2200);
 }
 
-// --- Validade ---
-function renderValidity() {
+// ===== CLOCK =====
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('clock').textContent = `${h}:${m}`;
+}
+
+// ===== VALIDADE =====
+function updateValidity() {
   const start = new Date('2026-08-26T15:00:00-03:00');
   const end   = new Date('2026-09-02T11:15:00-03:00');
   const now   = new Date();
 
-  const chip = document.getElementById('validityChip');
-  const txt  = document.getElementById('validityText');
-  const dot  = chip.querySelector('.chip-dot');
+  const total  = end - start;
+  const elapsed = now - start;
+  const pct    = Math.max(0, Math.min(100, (elapsed / total) * 100));
 
+  document.getElementById('vcProgress').style.width = pct + '%';
+
+  let remaining = '';
   if (now < start) {
-    const diff = Math.ceil((start - now) / 86400000);
-    txt.textContent = `Inicia em ${diff}d`;
-    dot.style.background = '#e0c84b';
-    dot.classList.remove('pulse');
+    remaining = 'Ainda não iniciou';
+    document.getElementById('vcStatusText').textContent = 'Pendente';
+    document.getElementById('vcStatus').querySelector('.vc-dot').style.background = '#e6c96d';
   } else if (now > end) {
-    txt.textContent = 'Expirado';
-    dot.style.background = '#c0392b';
-    dot.classList.remove('pulse');
-    chip.style.borderColor = 'rgba(192,57,43,0.5)';
+    remaining = 'Expirado';
+    document.getElementById('vcStatusText').textContent = 'Expirado';
+    document.getElementById('vcStatus').querySelector('.vc-dot').style.background = '#e05555';
   } else {
-    const remaining = Math.ceil((end - now) / 86400000);
-    txt.textContent = `Válido · ${remaining}d restantes`;
-    dot.style.background = '#4cde8a';
+    const diffMs = end - now;
+    const days   = Math.floor(diffMs / 86400000);
+    const hours  = Math.floor((diffMs % 86400000) / 3600000);
+    remaining = days > 0 ? `${days}d ${hours}h restantes` : `${hours}h restantes`;
+  }
+
+  document.getElementById('vcRemaining').textContent = remaining;
+
+  // Countdown no quick info
+  if (now < end && now >= start) {
+    const diffMs = end - now;
+    const d = Math.floor(diffMs / 86400000);
+    const h = Math.floor((diffMs % 86400000) / 3600000);
+    document.getElementById('countdown').textContent = `${d}d ${h}h`;
+  } else {
+    document.getElementById('countdown').textContent = now > end ? 'Encerrado' : 'Aguardando';
   }
 }
 
-// --- Popup de confirmação ---
-let currentDoor = '';
-function openPopup(name, icon) {
-  currentDoor = name;
-  document.getElementById('popupIcon').textContent = icon;
-  document.getElementById('popupDoorName').textContent = name;
-  document.getElementById('popupOverlay').classList.add('active');
-  // Haptic feedback (mobile)
-  if (navigator.vibrate) navigator.vibrate(30);
+// ===== RENDER PORTAS (bolinhas Bloco F) =====
+function renderDoors() {
+  const grid = document.getElementById('doorsGrid');
+  grid.innerHTML = '';
+
+  BLOCO_F.forEach((door, idx) => {
+    const btn = document.createElement('button');
+    btn.className = `door-btn ${door.cat}`;
+    btn.setAttribute('aria-label', `Abrir ${door.name}`);
+
+    btn.innerHTML = `
+      <div class="door-circle">
+        <div class="door-badge"></div>
+        <div class="door-icon">${door.icon}</div>
+        <div class="door-label">${door.label}</div>
+        <div class="door-sub-label">${door.sub}</div>
+      </div>
+    `;
+
+    // Entrada animada
+    btn.style.opacity = '0';
+    btn.style.transform = 'scale(0.4) translateY(20px)';
+
+    btn.addEventListener('click', (e) => {
+      rippleEffect(btn.querySelector('.door-circle'), e);
+      if (navigator.vibrate) navigator.vibrate(40);
+      openModal(door);
+    });
+
+    grid.appendChild(btn);
+
+    setTimeout(() => {
+      btn.style.transition = 'opacity 0.4s ease, transform 0.5s cubic-bezier(.34,1.56,.64,1)';
+      btn.style.opacity = '1';
+      btn.style.transform = 'scale(1) translateY(0)';
+    }, 100 + idx * 120);
+  });
 }
 
-function closePopup() {
-  document.getElementById('popupOverlay').classList.remove('active');
+// ===== RIPPLE =====
+function rippleEffect(el, event) {
+  const rect = el.getBoundingClientRect();
+  const r = Math.max(rect.width, rect.height);
+  const d = document.createElement('div');
+  d.className = 'ripple';
+  d.style.cssText = `
+    width:${r}px;height:${r}px;
+    left:${(rect.width-r)/2}px;
+    top:${(rect.height-r)/2}px;
+  `;
+  el.appendChild(d);
+  setTimeout(() => d.remove(), 600);
 }
 
+// ===== MODAL =====
+function openModal(door) {
+  currentDoor = door;
+  document.getElementById('modalIcon').textContent = door.icon;
+  document.getElementById('modalTitle').textContent = 'Abrir Acesso';
+  document.getElementById('modalDoor').textContent = door.name;
+  document.getElementById('miBloco').textContent = 'F';
+  document.getElementById('miTipo').textContent = door.tipo;
+  document.getElementById('modalOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+  currentDoor = null;
+}
+
+// ===== CONFIRMAR ABERTURA =====
 function confirmOpen() {
-  closePopup();
+  if (!currentDoor) return;
 
-  // Simula a abertura via API (POST para o sistema real)
-  simulateOpen(currentDoor);
+  const door = currentDoor;
+  closeModal();
 
-  // Popup de sucesso
-  document.getElementById('successDoorName').textContent = currentDoor;
-  document.getElementById('popupIcon').textContent = '✅';
-  const overlay = document.getElementById('successOverlay');
-  overlay.classList.add('active');
+  // Registra no histórico
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  addHistory(door, timeStr);
+
+  // Mostra sucesso
+  document.getElementById('successDoor').textContent = door.name;
+  document.getElementById('successTime').textContent = `Aberto às ${timeStr}`;
+  document.getElementById('progressBar').style.width = '0%';
+
+  const successOverlay = document.getElementById('successOverlay');
+  successOverlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
 
   // Barra de progresso
   setTimeout(() => {
-    const bar = document.getElementById('progressBar');
-    bar.style.width = '100%';
-  }, 100);
+    document.getElementById('progressBar').style.width = '100%';
+  }, 80);
 
-  // Fecha automaticamente após 3.5s
-  setTimeout(() => {
-    closeSuccess();
-  }, 3600);
+  // Countdown regressivo
+  let count = 5;
+  document.getElementById('openTimer').textContent = count;
+  clearInterval(openTimerInterval);
+  openTimerInterval = setInterval(() => {
+    count--;
+    document.getElementById('openTimer').textContent = count;
+    if (count <= 0) {
+      clearInterval(openTimerInterval);
+      closeSuccess();
+    }
+  }, 1000);
 
-  if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+  if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
+
+  // Simula chamada API
+  console.log(`[Gramado App] Porta aberta: ${door.name} às ${timeStr}`);
 }
 
 function closeSuccess() {
-  const overlay = document.getElementById('successOverlay');
-  overlay.classList.remove('active');
+  clearInterval(openTimerInterval);
+  document.getElementById('successOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+
   // Reset progress bar
   setTimeout(() => {
-    document.getElementById('progressBar').style.transition = 'none';
-    document.getElementById('progressBar').style.width = '0%';
-    setTimeout(() => {
-      document.getElementById('progressBar').style.transition = 'width 3s linear';
-    }, 50);
-  }, 300);
+    const pb = document.getElementById('progressBar');
+    pb.style.transition = 'none';
+    pb.style.width = '0%';
+    setTimeout(() => { pb.style.transition = 'width 5s linear'; }, 50);
+  }, 350);
 }
 
-// --- Simulação de abertura (integração futura com API real) ---
-function simulateOpen(doorName) {
-  console.log(`[Voucher] Abrindo: ${doorName}`);
-  // Aqui pode chamar a API real:
-  // fetch(VOUCHER_URL, { method: 'POST', body: JSON.stringify({ door: doorName }) })
-  //   .then(r => r.json()).then(console.log).catch(console.error);
+// ===== HISTÓRICO =====
+function addHistory(door, timeStr) {
+  historyItems.unshift({ door, timeStr });
+
+  const list = document.getElementById('historyList');
+  const empty = list.querySelector('.history-empty');
+  if (empty) empty.remove();
+
+  const item = document.createElement('div');
+  item.className = 'history-item';
+  item.innerHTML = `
+    <div class="hi-icon">${door.icon}</div>
+    <div>
+      <div class="hi-name">${door.name}</div>
+      <div class="hi-time">Hoje às ${timeStr}</div>
+    </div>
+    <div class="hi-check">✅</div>
+  `;
+  list.prepend(item);
 }
 
-// --- Fecha popup ao clicar fora ---
-document.getElementById('popupOverlay').addEventListener('click', (e) => {
-  if (e.target === e.currentTarget) closePopup();
-});
-document.getElementById('successOverlay').addEventListener('click', (e) => {
-  if (e.target === e.currentTarget) closeSuccess();
-});
+// ===== TOAST =====
+function showToast(msg, duration = 2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
 
-// --- Init ---
-document.addEventListener('DOMContentLoaded', () => {
-  renderValidity();
-  renderDoors();
+// ===== NOTIFICAÇÃO =====
+function showNotif() {
+  document.getElementById('notifOverlay').classList.add('active');
+  document.getElementById('notifOverlay').querySelector('.modal').style.borderRadius = '28px 28px 0 0';
+  document.body.style.overflow = 'hidden';
+  // Remove badge
+  document.querySelector('.notif-badge').style.display = 'none';
+}
 
-  // Atualiza validade a cada minuto
-  setInterval(renderValidity, 60_000);
+// ===== NAV =====
+function setNav(btn, tab) {
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
 
-  // Neve animada extra (randomiza velocidade)
-  document.querySelectorAll('.snowflake').forEach(el => {
-    const dur = 6 + Math.random() * 8;
-    el.style.animationDuration = dur + 's';
+  if (tab === 'map') {
+    showToast('🗺️ Rua Sete de Setembro, 100 — Gramado/RS');
+  } else if (tab === 'info') {
+    showToast('ℹ️ Check-out: 02/09 às 11:15');
+  }
+}
+
+// ===== FECHAR OVERLAY AO CLICAR FORA =====
+['modalOverlay', 'successOverlay', 'notifOverlay'].forEach(id => {
+  document.getElementById(id).addEventListener('click', (e) => {
+    if (e.target.id === id) {
+      if (id === 'modalOverlay') closeModal();
+      else if (id === 'successOverlay') closeSuccess();
+      else {
+        document.getElementById(id).classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
   });
 });
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', initSplash);
