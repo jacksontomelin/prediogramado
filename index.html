@@ -5,42 +5,36 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
   <meta name="theme-color" content="#0e2016"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <title>Aire Gramado — Bloco F</title>
+  <title>Aire Gramado — Acesso</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
-<!-- STATUS BAR -->
 <div class="status-bar">
   <span class="time" id="clock">--:--</span>
-  <div class="status-icons">
-    <span>📶</span><span>🔋</span>
-  </div>
+  <div>📶 🔋</div>
 </div>
 
-<!-- SPLASH SCREEN -->
+<!-- SPLASH -->
 <div class="splash" id="splash">
   <div class="splash-pine left">🌲</div>
   <div class="splash-pine right">🌲</div>
-  <div class="splash-snow" id="splashSnow"></div>
+  <div id="splashSnow"></div>
   <div class="splash-content">
     <div class="splash-logo">⛰️</div>
     <div class="splash-title">Aire Gramado</div>
     <div class="splash-sub">Zagonel · Gramado/RS</div>
-    <div class="splash-loader">
-      <div class="loader-bar" id="loaderBar"></div>
-    </div>
+    <div class="splash-loader"><div class="loader-bar" id="loaderBar"></div></div>
     <div class="splash-hint">Carregando acesso...</div>
   </div>
 </div>
 
-<!-- APP MAIN -->
+<!-- APP -->
 <div class="app" id="appMain" style="display:none">
 
-  <!-- HEADER COM PERFIL -->
+  <!-- HEADER -->
   <div class="app-header">
     <div class="header-left">
       <div class="avatar-ring">
@@ -52,76 +46,61 @@
         <div class="header-name">Lisandra</div>
       </div>
     </div>
-    <div class="header-right">
-      <button class="notif-btn" onclick="showNotif()">
-        🔔
-        <span class="notif-badge">1</span>
-      </button>
-    </div>
+    <button class="notif-btn" onclick="showNotif()">
+      🔔<span class="notif-badge"></span>
+    </button>
   </div>
 
-  <!-- CARD DO VOUCHER -->
+  <!-- VOUCHER CARD -->
   <div class="voucher-card">
     <div class="vc-glow"></div>
     <div class="vc-top">
       <div class="vc-label">Acesso Visitante</div>
-      <div class="vc-status" id="vcStatus">
-        <div class="vc-dot pulse"></div>
-        <span id="vcStatusText">Ativo</span>
-      </div>
+      <div class="vc-status"><div class="vc-dot pulse"></div><span>Ativo</span></div>
     </div>
     <div class="vc-unit">Unidade <span class="vc-num">5303</span></div>
-    <div class="vc-block">Bloco <span class="vc-bl">E</span> — Gramado/RS</div>
+    <div class="vc-block">Bloco E · Gramado/RS</div>
     <div class="vc-divider"></div>
     <div class="vc-validity">
-      <div class="vc-vitem">
-        <div class="vc-vl">Início</div>
-        <div class="vc-vv">26 Ago · 15:00</div>
-      </div>
+      <div class="vc-vitem"><div class="vc-vl">Início</div><div class="vc-vv">26 Ago · 15:00</div></div>
       <div class="vc-vsep">→</div>
-      <div class="vc-vitem">
-        <div class="vc-vl">Término</div>
-        <div class="vc-vv">02 Set · 11:15</div>
-      </div>
+      <div class="vc-vitem"><div class="vc-vl">Término</div><div class="vc-vv">02 Set · 11:15</div></div>
     </div>
-    <div class="vc-progress-wrap">
-      <div class="vc-progress" id="vcProgress"></div>
-    </div>
+    <div class="vc-progress-wrap"><div class="vc-progress" id="vcProgress"></div></div>
     <div class="vc-remaining" id="vcRemaining">Calculando...</div>
   </div>
 
-  <!-- SEÇÃO BLOCO F -->
-  <div class="section-header">
-    <div class="sh-icon">🏢</div>
-    <div>
-      <div class="sh-title">Bloco F</div>
-      <div class="sh-sub">3 acessos liberados</div>
-    </div>
-    <div class="sh-badge">SEU BLOCO</div>
+  <!-- TABS -->
+  <div class="tabs-scroll">
+    <div class="tabs-wrap" id="tabsWrap"></div>
   </div>
 
-  <!-- GRID BOLINHAS — apenas Bloco F -->
+  <!-- SECTION HEADER -->
+  <div class="section-header">
+    <div class="sh-icon" id="shIcon">🏢</div>
+    <div>
+      <div class="sh-title" id="shTitle">Bloco F</div>
+      <div class="sh-sub" id="shSub">3 acessos liberados</div>
+    </div>
+    <div class="sh-badge" id="shBadge">SEU BLOCO</div>
+  </div>
+
+  <!-- GRID -->
   <div class="doors-grid" id="doorsGrid"></div>
 
   <!-- QUICK INFO -->
   <div class="quick-info">
     <div class="qi-item">
       <div class="qi-icon">📍</div>
-      <div class="qi-text">
-        <div class="qi-title">Localização</div>
-        <div class="qi-val">Rua Sete de Setembro, 100</div>
-      </div>
+      <div><div class="qi-title">Endereço</div><div class="qi-val">Rua 7 de Set., 100</div></div>
     </div>
     <div class="qi-item">
       <div class="qi-icon">⏰</div>
-      <div class="qi-text">
-        <div class="qi-title">Check-out</div>
-        <div class="qi-val" id="countdown">--</div>
-      </div>
+      <div><div class="qi-title">Check-out</div><div class="qi-val" id="countdown">--</div></div>
     </div>
   </div>
 
-  <!-- HISTORICO -->
+  <!-- HISTÓRICO -->
   <div class="section-label">Histórico de acessos</div>
   <div class="history-list" id="historyList">
     <div class="history-empty">Nenhum acesso registrado ainda.</div>
@@ -130,51 +109,33 @@
   <!-- BOTTOM NAV -->
   <div class="bottom-nav">
     <button class="nav-item active" onclick="setNav(this,'home')">
-      <span class="nav-icon">🏠</span>
-      <span class="nav-label">Início</span>
+      <span class="nav-icon">🏠</span><span class="nav-label">Início</span>
     </button>
     <button class="nav-item" onclick="setNav(this,'map')">
-      <span class="nav-icon">🗺️</span>
-      <span class="nav-label">Mapa</span>
+      <span class="nav-icon">🗺️</span><span class="nav-label">Mapa</span>
     </button>
     <button class="nav-item" onclick="setNav(this,'info')">
-      <span class="nav-icon">ℹ️</span>
-      <span class="nav-label">Informações</span>
+      <span class="nav-icon">ℹ️</span><span class="nav-label">Informações</span>
     </button>
   </div>
-
-</div><!-- /app -->
+</div>
 
 <!-- MODAL ABERTURA -->
 <div class="modal-overlay" id="modalOverlay">
-  <div class="modal" id="modal">
+  <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
     <div class="modal-icon" id="modalIcon">🚪</div>
-    <div class="modal-title" id="modalTitle">Abrir Porta</div>
+    <div class="modal-title">Confirmar Acesso</div>
     <div class="modal-door" id="modalDoor">–</div>
-
     <div class="modal-info">
-      <div class="mi-row">
-        <span class="mi-l">Bloco</span>
-        <span class="mi-v" id="miBloco">F</span>
-      </div>
-      <div class="mi-row">
-        <span class="mi-l">Tipo</span>
-        <span class="mi-v" id="miTipo">–</span>
-      </div>
-      <div class="mi-row">
-        <span class="mi-l">Status</span>
-        <span class="mi-v success">✅ Autorizado</span>
-      </div>
+      <div class="mi-row"><span class="mi-l">Grupo</span><span class="mi-v" id="miBloco">–</span></div>
+      <div class="mi-row"><span class="mi-l">Tipo</span><span class="mi-v" id="miTipo">–</span></div>
+      <div class="mi-row"><span class="mi-l">Status</span><span class="mi-v success">✅ Autorizado</span></div>
     </div>
-
     <div class="modal-hint">Confirme para liberar o acesso agora.</div>
-
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-      <button class="btn-open" id="btnOpen" onclick="confirmOpen()">
-        <span class="btn-icon">🔓</span> Abrir
-      </button>
+      <button class="btn-open" onclick="confirmOpen()"><span>🔓</span> Abrir</button>
     </div>
   </div>
 </div>
@@ -182,26 +143,21 @@
 <!-- MODAL SUCESSO -->
 <div class="modal-overlay" id="successOverlay">
   <div class="modal success-modal">
-    <div class="success-ring">
-      <div class="success-check" id="successCheck">✓</div>
-    </div>
+    <div class="success-ring"><div class="success-check">✓</div></div>
     <div class="modal-title">Acesso Liberado!</div>
     <div class="success-door" id="successDoor">–</div>
     <div class="success-time" id="successTime">–</div>
     <div class="open-timer">
-      <div class="ot-label">Porta abre por</div>
+      <div class="ot-label">Fechando em</div>
       <div class="ot-count" id="openTimer">5</div>
-      <div class="ot-label">segundos</div>
+      <div class="ot-label">seg</div>
     </div>
     <div class="prog-wrap"><div class="prog-bar" id="progressBar"></div></div>
     <button class="btn-open full" onclick="closeSuccess()">Fechar</button>
   </div>
 </div>
 
-<!-- NOTIFICAÇÃO TOAST -->
-<div class="toast" id="toast"></div>
-
-<!-- NOTIF MODAL -->
+<!-- NOTIF -->
 <div class="modal-overlay" id="notifOverlay">
   <div class="modal">
     <button class="modal-close" onclick="document.getElementById('notifOverlay').classList.remove('active')">✕</button>
@@ -209,13 +165,12 @@
     <div class="modal-title">Notificações</div>
     <div class="notif-item">
       <div class="ni-dot"></div>
-      <div>
-        <div class="ni-text">Seu voucher está ativo e válido até 02/09/2026.</div>
-        <div class="ni-time">Agora</div>
-      </div>
+      <div><div class="ni-text">Voucher ativo · válido até 02/09/2026 às 11:15.</div><div class="ni-time">Agora</div></div>
     </div>
   </div>
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script src="app.js"></script>
 </body>
