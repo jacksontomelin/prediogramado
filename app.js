@@ -226,17 +226,30 @@ function setNav(btn, tab) {
   if (tab === 'info') showToast('Check-out: 02/09 às 11:15');
 }
 
-['modalOverlay','successOverlay','notifOverlay'].forEach(id => {
-  document.getElementById(id).addEventListener('click', e => {
-    if (e.target.id === id) {
-      if (id === 'modalOverlay') closeModal();
-      else if (id === 'successOverlay') closeSuccess();
-      else document.getElementById(id).classList.remove('active');
-    }
+function attachOverlayListeners() {
+  ['modalOverlay','successOverlay','notifOverlay'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('click', e => {
+      if (e.target.id === id) {
+        if (id === 'modalOverlay') closeModal();
+        else if (id === 'successOverlay') closeSuccess();
+        else el.classList.remove('active');
+      }
+    });
   });
-});
+}
 
-document.addEventListener('DOMContentLoaded', initSplash);
+function boot() {
+  attachOverlayListeners();
+  initSplash();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
+}
 
 // ===== PERSISTÊNCIA LOCAL =====
 const STORAGE_KEY = 'gramado_historico';

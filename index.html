@@ -201,18 +201,24 @@
 <script src="icons.js"></script>
 <script src="app.js"></script>
 <script>
-  // Injetar SVGs na UI após icons.js carregar
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('notifIconSvg').innerHTML = ICONS.bell;
-    document.getElementById('qiLoc').innerHTML = ICONS.location;
-    document.getElementById('qiTime').innerHTML = ICONS.clock;
-    document.getElementById('navHome').innerHTML = ICONS.home;
-    document.getElementById('navMap').innerHTML = ICONS.map;
-    document.getElementById('navInfo').innerHTML = ICONS.info;
-    document.getElementById('btnUnlockSvg').innerHTML = ICONS.unlock;
-    document.getElementById('successCheckSvg').innerHTML = ICONS.check;
-    document.getElementById('notifModalIcon').innerHTML = ICONS.bell;
-  });
+  // Injetar SVGs na UI (protegido contra elemento ausente)
+  function injectUIIcons() {
+    if (typeof ICONS === 'undefined') return;
+    const map = {
+      notifIconSvg: 'bell', qiLoc: 'location', qiTime: 'clock',
+      navHome: 'home', navMap: 'map', navInfo: 'info',
+      btnUnlockSvg: 'unlock', successCheckSvg: 'check', notifModalIcon: 'bell'
+    };
+    for (const [elId, iconKey] of Object.entries(map)) {
+      const el = document.getElementById(elId);
+      if (el && ICONS[iconKey]) el.innerHTML = ICONS[iconKey];
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectUIIcons);
+  } else {
+    injectUIIcons();
+  }
 </script>
 </body>
 </html>
