@@ -1,40 +1,39 @@
 // ============================================================
-// AIRE GRAMADO ZAGONEL — App Completo v4.0
+// AIRE GRAMADO ZAGONEL — App v5.0 — SVG Duotone Icons
 // Jackson Tomelin · UniController
 // ============================================================
 
-const TODAS_PORTAS = [
-  // BLOCO F — destaque
-  { id:'f-escada',   name:'F - Escada da Garagem', label:'Escada',   sub:'Garagem · F',  icon:'🪜', tipo:'Escada',   grupo:'F', cat:'escada'   },
-  { id:'f-hall',     name:'F - Hall do Térreo',    label:'Hall',     sub:'Térreo · F',   icon:'🏛️', tipo:'Hall',     grupo:'F', cat:'hall'     },
-  { id:'f-elevador', name:'F - Elevador',           label:'Elevador', sub:'Bloco F',      icon:'🛗', tipo:'Elevador', grupo:'F', cat:'elevador' },
+const PORTAS = {
+  F: [
+    { id:'f-escada',   name:'F - Escada da Garagem', label:'Escada',   sub:'Garagem',  iconKey:'escada',   tipo:'Escada',   grupo:'F',        color:'#4a7c5f' },
+    { id:'f-hall',     name:'F - Hall do Térreo',    label:'Hall',     sub:'Térreo',   iconKey:'hall',     tipo:'Hall',     grupo:'F',        color:'#4a9e6b' },
+    { id:'f-elevador', name:'F - Elevador',           label:'Elevador', sub:'Bloco F',  iconKey:'elevador', tipo:'Elevador', grupo:'F',        color:'#c8a84b' },
+  ],
+  LAZER: [
+    { id:'piscina',  name:'Piscina',        label:'Piscina',   sub:'Lazer',  iconKey:'piscina',  tipo:'Lazer', grupo:'LAZER', color:'#3e8bbf' },
+    { id:'academia', name:'Academia',       label:'Academia',  sub:'Lazer',  iconKey:'academia', tipo:'Lazer', grupo:'LAZER', color:'#8b4dc2' },
+    { id:'jogos',    name:'Sala de Jogos',  label:'Jogos',     sub:'Lazer',  iconKey:'jogos',    tipo:'Lazer', grupo:'LAZER', color:'#d4694a' },
+    { id:'brinquedo',name:'Brinquedoteca', label:'Brinquedos',sub:'Lazer',  iconKey:'brinquedo',tipo:'Lazer', grupo:'LAZER', color:'#c26b8b' },
+  ],
+  PORTARIA: [
+    { id:'p0', name:'Portaria Rua Nelson Dinnebier', label:'Portaria',sub:'Rua Nelson',iconKey:'portaria',tipo:'Portaria',grupo:'PORTARIA',color:'#8b2c2c' },
+    { id:'p1', name:'Portaria Rua Sete de Setembro', label:'Portaria',sub:'Rua 7 Set.',iconKey:'portaria',tipo:'Portaria',grupo:'PORTARIA',color:'#8b2c2c' },
+  ],
+  VISITANTE: [
+    { id:'ve', name:'Visitante - Eclusa Externa', label:'Eclusa', sub:'Externa', iconKey:'visitante', tipo:'Eclusa', grupo:'VISITANTE', color:'#e06b1e' },
+    { id:'vi', name:'Visitante - Eclusa Interna', label:'Eclusa', sub:'Interna', iconKey:'visitante', tipo:'Eclusa', grupo:'VISITANTE', color:'#e06b1e' },
+  ],
+};
 
-  // LAZER
-  { id:'piscina',    name:'Piscina',           label:'Piscina',      sub:'Área de Lazer', icon:'🏊', tipo:'Lazer',  grupo:'LAZER', cat:'lazer' },
-  { id:'academia',   name:'Academia',          label:'Academia',     sub:'Área de Lazer', icon:'🏋️', tipo:'Lazer',  grupo:'LAZER', cat:'lazer' },
-  { id:'jogos',      name:'Sala de Jogos',     label:'Jogos',        sub:'Área de Lazer', icon:'🎮', tipo:'Lazer',  grupo:'LAZER', cat:'lazer' },
-  { id:'brinquedo',  name:'Brinquedoteca',     label:'Brinquedos',   sub:'Área de Lazer', icon:'🧸', tipo:'Lazer',  grupo:'LAZER', cat:'lazer' },
-
-  // PORTARIAS / VEÍCULOS
-  { id:'portaria0',  name:'Portaria Rua Nelson Dinnebier', label:'Portaria',  sub:'Rua Nelson',   icon:'🚗', tipo:'Portaria', grupo:'PORTARIA', cat:'portaria' },
-  { id:'portaria1',  name:'Portaria Rua Sete de Setembro', label:'Portaria',  sub:'Rua 7 Set.',   icon:'🚗', tipo:'Portaria', grupo:'PORTARIA', cat:'portaria' },
-
-  // VISITANTE
-  { id:'vis-ext',    name:'Visitante - Eclusa Externa', label:'Eclusa',  sub:'Externa',      icon:'🙋', tipo:'Eclusa',   grupo:'VISITANTE', cat:'visitante' },
-  { id:'vis-int',    name:'Visitante - Eclusa Interna', label:'Eclusa',  sub:'Interna',      icon:'🙋', tipo:'Eclusa',   grupo:'VISITANTE', cat:'visitante' },
-];
-
-// Abas de navegação entre grupos
 const TABS = [
-  { id:'F',        label:'Bloco F',   icon:'🏢' },
-  { id:'LAZER',    label:'Lazer',     icon:'🏊' },
-  { id:'PORTARIA', label:'Portaria',  icon:'🚗' },
-  { id:'VISITANTE',label:'Visitante', icon:'🙋' },
+  { id:'F',         label:'Bloco F',  iconKey:'hall'     },
+  { id:'LAZER',     label:'Lazer',    iconKey:'piscina'  },
+  { id:'PORTARIA',  label:'Portaria', iconKey:'portaria' },
+  { id:'VISITANTE', label:'Visitante',iconKey:'visitante'},
 ];
 
 let currentDoor = null;
 let openTimerInterval = null;
-let activeTab = 'F';
 
 // ===== SPLASH =====
 function initSplash() {
@@ -48,11 +47,7 @@ function initSplash() {
   }
   const bar = document.getElementById('loaderBar');
   let pct = 0;
-  const iv = setInterval(() => {
-    pct += Math.random() * 20;
-    if (pct >= 100) { pct = 100; clearInterval(iv); }
-    bar.style.width = pct + '%';
-  }, 120);
+  const iv = setInterval(() => { pct += Math.random()*20; if(pct>=100){pct=100;clearInterval(iv);} bar.style.width=pct+'%'; }, 120);
   setTimeout(() => {
     document.getElementById('splash').classList.add('hide');
     document.getElementById('appMain').style.display = 'block';
@@ -75,12 +70,11 @@ function updateValidity() {
   const start = new Date('2026-08-26T15:00:00-03:00');
   const end   = new Date('2026-09-02T11:15:00-03:00');
   const now   = new Date();
-  const pct   = Math.max(0, Math.min(100, ((now - start) / (end - start)) * 100));
+  const pct   = Math.max(0, Math.min(100, ((now-start)/(end-start))*100));
   document.getElementById('vcProgress').style.width = pct + '%';
   const diff = end - now;
   if (diff > 0) {
-    const d = Math.floor(diff / 86400000);
-    const h = Math.floor((diff % 86400000) / 3600000);
+    const d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000);
     const txt = d > 0 ? `${d}d ${h}h restantes` : `${h}h restantes`;
     document.getElementById('vcRemaining').textContent = txt;
     document.getElementById('countdown').textContent = txt;
@@ -98,26 +92,24 @@ function renderTabs() {
     const btn = document.createElement('button');
     btn.className = 'tab-btn';
     btn.id = 'tab-' + t.id;
-    btn.innerHTML = `<span class="tab-icon">${t.icon}</span><span class="tab-label">${t.label}</span>`;
+    const svg = window.ICONS[t.iconKey] || '';
+    btn.innerHTML = `<span class="tab-icon-svg">${svg}</span><span class="tab-label">${t.label}</span>`;
     btn.onclick = () => setTab(t.id);
     wrap.appendChild(btn);
   });
 }
 
 function setTab(id) {
-  activeTab = id;
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  const activeBtn = document.getElementById('tab-' + id);
-  if (activeBtn) activeBtn.classList.add('active');
-
-  const portas = TODAS_PORTAS.filter(p => p.grupo === id);
-  const info = TABS.find(t => t.id === id);
-
-  document.getElementById('shIcon').textContent = info.icon;
-  document.getElementById('shTitle').textContent = info.label;
-  document.getElementById('shSub').textContent = `${portas.length} ${portas.length === 1 ? 'acesso' : 'acessos'} liberados`;
+  const ab = document.getElementById('tab-' + id);
+  if (ab) ab.classList.add('active');
+  const t = TABS.find(x => x.id === id);
+  const portas = PORTAS[id] || [];
+  const svg = window.ICONS[t.iconKey] || '';
+  document.getElementById('shIconSvg').innerHTML = svg;
+  document.getElementById('shTitle').textContent = t.label;
+  document.getElementById('shSub').textContent = `${portas.length} ${portas.length===1?'acesso':'acessos'} liberados`;
   document.getElementById('shBadge').textContent = id === 'F' ? 'SEU BLOCO' : '';
-
   renderDoors(portas);
 }
 
@@ -125,22 +117,22 @@ function setTab(id) {
 function renderDoors(portas) {
   const grid = document.getElementById('doorsGrid');
   grid.innerHTML = '';
-
   portas.forEach((door, idx) => {
     const btn = document.createElement('button');
-    btn.className = `door-btn ${door.cat}`;
+    btn.className = 'door-btn';
     btn.setAttribute('aria-label', `Abrir ${door.name}`);
+    const svg = window.ICONS[door.iconKey] || '';
     btn.innerHTML = `
-      <div class="door-circle">
+      <div class="door-circle" style="--door-color:${door.color}">
         <div class="door-badge"></div>
-        <div class="door-icon">${door.icon}</div>
+        <div class="door-svg-wrap">${svg}</div>
         <div class="door-label">${door.label}</div>
         <div class="door-sub-label">${door.sub}</div>
       </div>
     `;
     btn.style.opacity = '0';
     btn.style.transform = 'scale(0.4) translateY(16px)';
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', () => {
       rippleEffect(btn.querySelector('.door-circle'));
       if (navigator.vibrate) navigator.vibrate(40);
       openModal(door);
@@ -166,7 +158,9 @@ function rippleEffect(el) {
 // ===== MODAL =====
 function openModal(door) {
   currentDoor = door;
-  document.getElementById('modalIcon').textContent = door.icon;
+  const svg = window.ICONS[door.iconKey] || '';
+  document.getElementById('modalIconSvg').innerHTML = svg;
+  document.getElementById('modalIconSvg').style.color = door.color;
   document.getElementById('modalDoor').textContent = door.name;
   document.getElementById('miBloco').textContent = door.grupo;
   document.getElementById('miTipo').textContent = door.tipo;
@@ -185,14 +179,12 @@ function confirmOpen() {
   const now = new Date();
   const t = now.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
   addHistory(door, t);
-  document.getElementById('successDoor').textContent = door.name;
+  document.getElementById('successDoorName').textContent = door.name;
   document.getElementById('successTime').textContent = `Liberado às ${t}`;
-  document.getElementById('progressBar').style.width = '0%';
+  const pb = document.getElementById('progressBar');
+  pb.style.transition = 'none'; pb.style.width = '0%';
   document.getElementById('successOverlay').classList.add('active');
-  setTimeout(() => {
-    document.getElementById('progressBar').style.transition = 'width 5s linear';
-    document.getElementById('progressBar').style.width = '100%';
-  }, 60);
+  setTimeout(() => { pb.style.transition='width 5s linear'; pb.style.width='100%'; }, 60);
   let c = 5;
   document.getElementById('openTimer').textContent = c;
   clearInterval(openTimerInterval);
@@ -202,29 +194,28 @@ function confirmOpen() {
     if (c <= 0) { clearInterval(openTimerInterval); closeSuccess(); }
   }, 1000);
   if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
-  showToast(`✅ ${door.label} aberta!`);
+  showToast(`Acesso liberado — ${door.label}`);
 }
 
 function closeSuccess() {
   clearInterval(openTimerInterval);
   document.getElementById('successOverlay').classList.remove('active');
-  setTimeout(() => {
-    const pb = document.getElementById('progressBar');
-    pb.style.transition = 'none'; pb.style.width = '0%';
-    setTimeout(() => { pb.style.transition = 'width 5s linear'; }, 50);
-  }, 350);
 }
 
 function addHistory(door, t) {
   const list = document.getElementById('historyList');
   const empty = list.querySelector('.history-empty');
   if (empty) empty.remove();
+  const svg = window.ICONS[door.iconKey] || '';
   const item = document.createElement('div');
   item.className = 'history-item';
   item.innerHTML = `
-    <div class="hi-icon">${door.icon}</div>
-    <div><div class="hi-name">${door.name}</div><div class="hi-time">Hoje às ${t}</div></div>
-    <div class="hi-check">✅</div>
+    <div class="hi-icon" style="color:${door.color}">${svg}</div>
+    <div>
+      <div class="hi-name">${door.name}</div>
+      <div class="hi-time">Hoje às ${t}</div>
+    </div>
+    <div class="hi-check">${window.ICONS.check}</div>
   `;
   list.prepend(item);
 }
@@ -232,7 +223,7 @@ function addHistory(door, t) {
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2600);
+  setTimeout(() => t.classList.remove('show'), 2800);
 }
 
 function showNotif() {
@@ -243,8 +234,8 @@ function showNotif() {
 function setNav(btn, tab) {
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  if (tab === 'map')  showToast('📍 Rua Sete de Setembro, 100');
-  if (tab === 'info') showToast('📋 Check-out: 02/09 às 11:15');
+  if (tab === 'map')  showToast('Rua Sete de Setembro, 100 · Gramado/RS');
+  if (tab === 'info') showToast('Check-out: 02/09 às 11:15');
 }
 
 ['modalOverlay','successOverlay','notifOverlay'].forEach(id => {

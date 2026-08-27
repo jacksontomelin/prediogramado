@@ -13,8 +13,11 @@
 <body>
 
 <div class="status-bar">
-  <span class="time" id="clock">--:--</span>
-  <div>📶 🔋</div>
+  <span id="clock">--:--</span>
+  <div class="status-icons">
+    <svg width="16" height="12" viewBox="0 0 16 12" fill="rgba(255,255,255,0.7)"><rect x="0" y="4" width="2" height="8" rx="1"/><rect x="4" y="2" width="2" height="10" rx="1"/><rect x="8" y="0" width="2" height="12" rx="1"/><rect x="12" y="0" width="2" height="12" rx="1" opacity="0.3"/></svg>
+    <svg width="22" height="12" viewBox="0 0 22 12" fill="none"><rect x="0.5" y="0.5" width="18" height="11" rx="2.5" stroke="rgba(255,255,255,0.7)" stroke-width="1"/><rect x="2" y="2" width="13" height="8" rx="1.5" fill="rgba(255,255,255,0.7)"/><path d="M20 4.5V7.5C20.8 7.2 21.5 6.4 21.5 6C21.5 5.6 20.8 4.8 20 4.5Z" fill="rgba(255,255,255,0.5)"/></svg>
+  </div>
 </div>
 
 <!-- SPLASH -->
@@ -23,9 +26,15 @@
   <div class="splash-pine right">🌲</div>
   <div id="splashSnow"></div>
   <div class="splash-content">
-    <div class="splash-logo">⛰️</div>
+    <div class="splash-logo">
+      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="72" height="72">
+        <path d="M32 6 L58 54 H6 Z" fill="rgba(200,168,75,0.2)" stroke="#c8a84b" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M32 18 L48 46 H16 Z" fill="rgba(200,168,75,0.15)" stroke="#e6c96d" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="32" cy="15" r="4" fill="#e6c96d" opacity="0.8"/>
+      </svg>
+    </div>
     <div class="splash-title">Aire Gramado</div>
-    <div class="splash-sub">Zagonel · Gramado/RS</div>
+    <div class="splash-sub">Zagonel · Gramado / RS</div>
     <div class="splash-loader"><div class="loader-bar" id="loaderBar"></div></div>
     <div class="splash-hint">Carregando acesso...</div>
   </div>
@@ -41,30 +50,34 @@
         <div class="avatar">L</div>
         <div class="avatar-online"></div>
       </div>
-      <div class="header-info">
+      <div>
         <div class="header-welcome">Bem-vindo,</div>
         <div class="header-name">Lisandra</div>
       </div>
     </div>
     <button class="notif-btn" onclick="showNotif()">
-      🔔<span class="notif-badge"></span>
+      <span class="notif-icon-svg" id="notifIconSvg"></span>
+      <span class="notif-badge"></span>
     </button>
   </div>
 
   <!-- VOUCHER CARD -->
   <div class="voucher-card">
     <div class="vc-glow"></div>
+    <div class="vc-pattern"></div>
     <div class="vc-top">
-      <div class="vc-label">Acesso Visitante</div>
+      <div class="vc-label">ACESSO VISITANTE</div>
       <div class="vc-status"><div class="vc-dot pulse"></div><span>Ativo</span></div>
     </div>
     <div class="vc-unit">Unidade <span class="vc-num">5303</span></div>
-    <div class="vc-block">Bloco E · Gramado/RS</div>
+    <div class="vc-block">Bloco E · Gramado / Rio Grande do Sul</div>
     <div class="vc-divider"></div>
     <div class="vc-validity">
       <div class="vc-vitem"><div class="vc-vl">Início</div><div class="vc-vv">26 Ago · 15:00</div></div>
-      <div class="vc-vsep">→</div>
-      <div class="vc-vitem"><div class="vc-vl">Término</div><div class="vc-vv">02 Set · 11:15</div></div>
+      <div class="vc-vsep">
+        <svg width="20" height="8" viewBox="0 0 20 8" fill="none"><path d="M0 4H17M14 1L17 4L14 7" stroke="#c8a84b" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div class="vc-vitem align-right"><div class="vc-vl">Término</div><div class="vc-vv">02 Set · 11:15</div></div>
     </div>
     <div class="vc-progress-wrap"><div class="vc-progress" id="vcProgress"></div></div>
     <div class="vc-remaining" id="vcRemaining">Calculando...</div>
@@ -77,12 +90,14 @@
 
   <!-- SECTION HEADER -->
   <div class="section-header">
-    <div class="sh-icon" id="shIcon">🏢</div>
+    <div class="sh-icon-wrap" id="shIconWrap">
+      <div class="sh-icon-svg" id="shIconSvg"></div>
+    </div>
     <div>
       <div class="sh-title" id="shTitle">Bloco F</div>
       <div class="sh-sub" id="shSub">3 acessos liberados</div>
     </div>
-    <div class="sh-badge" id="shBadge">SEU BLOCO</div>
+    <div class="sh-badge" id="shBadge"></div>
   </div>
 
   <!-- GRID -->
@@ -91,11 +106,11 @@
   <!-- QUICK INFO -->
   <div class="quick-info">
     <div class="qi-item">
-      <div class="qi-icon">📍</div>
+      <div class="qi-icon-svg" id="qiLoc"></div>
       <div><div class="qi-title">Endereço</div><div class="qi-val">Rua 7 de Set., 100</div></div>
     </div>
     <div class="qi-item">
-      <div class="qi-icon">⏰</div>
+      <div class="qi-icon-svg" id="qiTime"></div>
       <div><div class="qi-title">Check-out</div><div class="qi-val" id="countdown">--</div></div>
     </div>
   </div>
@@ -109,33 +124,39 @@
   <!-- BOTTOM NAV -->
   <div class="bottom-nav">
     <button class="nav-item active" onclick="setNav(this,'home')">
-      <span class="nav-icon">🏠</span><span class="nav-label">Início</span>
+      <span class="nav-svg" id="navHome"></span>
+      <span class="nav-label">Início</span>
     </button>
     <button class="nav-item" onclick="setNav(this,'map')">
-      <span class="nav-icon">🗺️</span><span class="nav-label">Mapa</span>
+      <span class="nav-svg" id="navMap"></span>
+      <span class="nav-label">Mapa</span>
     </button>
     <button class="nav-item" onclick="setNav(this,'info')">
-      <span class="nav-icon">ℹ️</span><span class="nav-label">Informações</span>
+      <span class="nav-svg" id="navInfo"></span>
+      <span class="nav-label">Informações</span>
     </button>
   </div>
-</div>
+
+</div><!-- /app -->
 
 <!-- MODAL ABERTURA -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-icon" id="modalIcon">🚪</div>
+    <div class="modal-icon-big" id="modalIconSvg"></div>
     <div class="modal-title">Confirmar Acesso</div>
     <div class="modal-door" id="modalDoor">–</div>
     <div class="modal-info">
       <div class="mi-row"><span class="mi-l">Grupo</span><span class="mi-v" id="miBloco">–</span></div>
       <div class="mi-row"><span class="mi-l">Tipo</span><span class="mi-v" id="miTipo">–</span></div>
-      <div class="mi-row"><span class="mi-l">Status</span><span class="mi-v success">✅ Autorizado</span></div>
+      <div class="mi-row"><span class="mi-l">Status</span><span class="mi-v success">Autorizado</span></div>
     </div>
     <div class="modal-hint">Confirme para liberar o acesso agora.</div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-      <button class="btn-open" onclick="confirmOpen()"><span>🔓</span> Abrir</button>
+      <button class="btn-open" onclick="confirmOpen()">
+        <span class="btn-unlock-svg" id="btnUnlockSvg"></span> Abrir
+      </button>
     </div>
   </div>
 </div>
@@ -143,9 +164,11 @@
 <!-- MODAL SUCESSO -->
 <div class="modal-overlay" id="successOverlay">
   <div class="modal success-modal">
-    <div class="success-ring"><div class="success-check">✓</div></div>
+    <div class="success-ring">
+      <div class="success-check-svg" id="successCheckSvg"></div>
+    </div>
     <div class="modal-title">Acesso Liberado!</div>
-    <div class="success-door" id="successDoor">–</div>
+    <div class="success-door" id="successDoorName">–</div>
     <div class="success-time" id="successTime">–</div>
     <div class="open-timer">
       <div class="ot-label">Fechando em</div>
@@ -157,21 +180,39 @@
   </div>
 </div>
 
-<!-- NOTIF -->
+<!-- NOTIF MODAL -->
 <div class="modal-overlay" id="notifOverlay">
   <div class="modal">
     <button class="modal-close" onclick="document.getElementById('notifOverlay').classList.remove('active')">✕</button>
-    <div class="modal-icon">🔔</div>
+    <div class="modal-icon-big" id="notifModalIcon" style="color:#4cde8a"></div>
     <div class="modal-title">Notificações</div>
     <div class="notif-item">
       <div class="ni-dot"></div>
-      <div><div class="ni-text">Voucher ativo · válido até 02/09/2026 às 11:15.</div><div class="ni-time">Agora</div></div>
+      <div>
+        <div class="ni-text">Voucher ativo · válido até 02/09/2026 às 11:15.</div>
+        <div class="ni-time">Agora</div>
+      </div>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
+<script src="icons.js"></script>
 <script src="app.js"></script>
+<script>
+  // Injetar SVGs na UI após icons.js carregar
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('notifIconSvg').innerHTML = ICONS.bell;
+    document.getElementById('qiLoc').innerHTML = ICONS.location;
+    document.getElementById('qiTime').innerHTML = ICONS.clock;
+    document.getElementById('navHome').innerHTML = ICONS.home;
+    document.getElementById('navMap').innerHTML = ICONS.map;
+    document.getElementById('navInfo').innerHTML = ICONS.info;
+    document.getElementById('btnUnlockSvg').innerHTML = ICONS.unlock;
+    document.getElementById('successCheckSvg').innerHTML = ICONS.check;
+    document.getElementById('notifModalIcon').innerHTML = ICONS.bell;
+  });
+</script>
 </body>
 </html>
