@@ -136,8 +136,7 @@ function renderDoors(portas) {
     btn.addEventListener('click', () => {
       rippleEffect(btn.querySelector('.door-circle'));
       if (navigator.vibrate) navigator.vibrate(40);
-      currentDoor = door;
-      confirmOpen();
+      openModal(door);
     });
     grid.appendChild(btn);
     setTimeout(() => {
@@ -174,13 +173,41 @@ function closeModal() {
   currentDoor = null;
 }
 
+// ===== CONFIG BACKEND =====
+// URL do endpoint que efetivamente abre a porta.
+// Preencha com o endpoint real do sistema condominioautonomo.com.br.
+// Ex.: 'https://www.condominioautonomo.com.br/CartaoVisitante/AbrirPorta'
+const BACKEND_URL = '';           // <<< coloque a URL do backend aqui
+const VOUCHER_CODE = '14869370-926c-455a-a47b-7b3863a11bf0';
+
+async function abrirPortaBackend(door) {
+  // Se não houver backend configurado, apenas simula (modo demo)
+  if (!BACKEND_URL) {
+    console.log('[demo] abertura simulada:', door.name);
+    return { ok: true, demo: true };
+  }
+  try {
+    const resp = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: VOUCHER_CODE, porta: door.id, nome: door.name }),
+    });
+    return { ok: resp.ok, status: resp.status };
+  } catch (e) {
+    console.error('[backend] falha ao abrir porta:', e);
+    return { ok: false, error: String(e) };
+  }
+}
+
 function confirmOpen() {
   if (!currentDoor) return;
   const door = currentDoor;
   closeModal();
+
   const now = new Date();
   const t = now.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
-  addHistory(door, t);
+
+  // Mostra sucesso e chama o backend em paralelo
   document.getElementById('successDoorName').textContent = door.name;
   document.getElementById('successTime').textContent = `Liberado às ${t}`;
   const pb = document.getElementById('progressBar');
@@ -196,7 +223,16 @@ function confirmOpen() {
     if (c <= 0) { clearInterval(openTimerInterval); closeSuccess(); }
   }, 1000);
   if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
-  showToast(`Acesso liberado — ${door.label}`);
+
+  // Chamada real ao backend — só acontece ao apertar "Abrir"
+  abrirPortaBackend(door).then(res => {
+    if (res.ok) {
+      addHistory(door, t);
+      showToast(`Acesso liberado — ${door.label}`);
+    } else {
+      showToast(`Falha ao abrir — tente novamente`);
+    }
+  });
 }
 
 function closeSuccess() {
